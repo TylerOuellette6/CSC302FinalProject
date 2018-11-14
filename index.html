@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data Editor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+    	var toggleVisibility = function(event){
+    		$("#edge-file-upload").toggle();
+    		$("#node-file-upload").toggle();
+    	}
+
+    	$(document).ready(function(){
+    		$(document).on('click', "#toggle-visibility", toggleVisibility)
+
+    	})
+    </script>
+</head>
+
+<form id="edge-file-upload">
+	<h1>Edge File (Required)</h1>
+	<input type="submit" name="upload-edge-file" Value="Upload">
+	<h4>Graph Type: </h4>
+	<input type="dropdown" name="graph-type" Value="hello">
+	<h4>Merge Type: </h4>
+</form>
+
+<form id="node-file-upload">
+	<h1>Node File (Optional)</h1>
+	<input type="submit" name="upload-node-file" Value="Upload">
+</form>
+
+<input type="submit" id="toggle-visibility" value="Toggle">
