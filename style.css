@@ -1,0 +1,65 @@
+header, body, footer, aside, nav, main, article, figure {
+    display: block; 
+}
+
+*{
+	margin: 0;
+	padding: 0;
+}
+
+#file-uploads{
+	/*How to center page: 
+	https://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/*/
+	position: fixed;
+	top: 50%;
+	left: 50%;
+
+	transform: translate(-50%, -50%);
+}
+#file-uploads h1{
+	display: inline-block;
+	margin: 10px;
+}
+#file-uploads .button{
+	position: relative;
+	float: right;
+	margin-top: 12px;
+	display: inline-block;
+	text-align: center; 
+	font-size: 150%;
+	padding: 2px;
+}
+#file-uploads h4{
+	position: relative;
+	margin-bottom: 1%;
+	margin-left: 2%;
+	display: inline-block;
+}
+#file-uploads .radio{
+	position: relative;
+	margin-bottom: 1%;
+	margin-left: 2%;
+	display: inline-block;
+}
+#file-uploads #create-tables{
+	position: fixed;
+	margin-top: 20px;
+	font-size: 150%;
+	left: 50%;
+	width: 50%;
+	transform: translate(-50%);
+}
+
+@media only screen and (max-width: 1600px){
+	#file-uploads h1{
+		display: block;
+	}
+	#file-uploads .button{
+		display: block;
+		margin-top: 0;
+		margin-bottom: 3px;
+	}
+	#file-uploads h4{
+		margin-top: 3px;
+	}
+}
