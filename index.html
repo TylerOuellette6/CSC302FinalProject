@@ -15,13 +15,8 @@
     		$("#node-file-upload").toggle();
     	}
 
-    	var showGraphTypeDropdown = function(event){
-    		$("#graph-type-dropdown").classList.toggle("show");
-    	}
-
     	$(document).ready(function(){
     		$(document).on('click', "#create-tables", toggleVisibility)
-    		$(document).on('click', "#graph-dropdown", showGraphTypeDropdown)
 
     	})
     </script>
@@ -46,5 +41,5 @@
 		<input type="file" accept=".csv, .tsv" class="button" name="node-file" Value="Upload">
 	</form>
 
-	<input type="submit" id="create-tables" value="Toggle">
+	<input type="submit" id="create-tables" value="Create Tables">
 </div>
