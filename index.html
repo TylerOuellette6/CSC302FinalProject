@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data Editor</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="normalize.css"/>
+    <link rel="stylesheet" href="style.css"/>
+    
+    <!-- jsGrid -->
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
+    <!-- AJAX -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+    	var toggleVisibility = function(event){
+    		$("#edge-file-upload").toggle();
+    		$("#node-file-upload").toggle();
+    	}
+
+    	$(document).ready(function(){
+    		$(document).on('click', "#create-tables", toggleVisibility)
+
+    	})
+    </script>
+</head>
+
+<div id="file-uploads">
+	<form id="edge-file-upload">
+		<h1>Edge File (Required)</h1>
+		<input type="file" accept=".csv, .tsv" class="button" name="upload-edge-file" Value="Upload"><br>
+
+		<h4>Graph Type: </h4>
+		<input type="radio" class="radio" name="graph-type" value="undirect"> Undirected
+		<input type="radio" class="radio" name="graph-type" value="direct"> Directed <br>
+
+		<h4>Merge Type: </h4>
+		<input type="radio" class="radio" name="merge-type" value="sum"> Sum
+		<input type="radio" class="radio" name="merge-type" value="dontmerge"> Don't Merge
+	</form>
+
+	<form id="node-file-upload">
+		<h1>Node File (Optional)</h1>
+		<input type="file" accept=".csv, .tsv" class="button" name="node-file" Value="Upload">
+	</form>
+
+	<input type="submit" id="create-tables" value="Create Tables">
+</div>
