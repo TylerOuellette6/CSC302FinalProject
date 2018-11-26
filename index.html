@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<?php include 'data-controller.php';?>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -34,6 +35,8 @@
     		$("#file-uploads").hide();
     		$("#data_page").show();
 
+    		<?php handleTables(document.getElementById('upload-edge-file').files[0].name);?>
+
     		window.history.pushState("", "Title", "/data-tables");
     	};
 
@@ -49,45 +52,62 @@
     
 </head>
 
-<div id="file-uploads">
-	<form id="edge-file-upload">
-		<h1>Edge File (Required)</h1>
-		<input type="file" accept=".csv, .tsv" class="button" name="upload-edge-file" Value="Upload"><br>
+<body>
+	<div id="file-uploads">
+		<form id="edge-file-upload">
+			<h1>Edge File (Required)</h1>
+			<input type="file" accept=".csv, .tsv" class="button" id="upload-edge-file" Value="Upload"><br>
 
-		<h4>Header? </h4>
-		<input type="radio" class="radio" name="header" value="yes"> Yes
-		<input type="radio" class="radio" name="header" value="no"> No <br>
+			<h4>Header? </h4>
+			<input type="radio" class="radio" name="header" value="yes"> Yes
+			<input type="radio" class="radio" name="header" value="no"> No <br>
 
-		<h4>Graph Type: </h4>
-		<input type="radio" class="radio" name="graph-type" value="undirect"> Undirected
-		<input type="radio" class="radio" name="graph-type" value="direct"> Directed <br>
+			<h4>Graph Type: </h4>
+			<input type="radio" class="radio" name="graph-type" value="undirect"> Undirected
+			<input type="radio" class="radio" name="graph-type" value="direct"> Directed <br>
 
-		<h4>Merge Type: </h4>
-		<input type="radio" class="radio" name="merge-type" value="sum"> Sum
-		<input type="radio" class="radio" name="merge-type" value="dontmerge"> Don't Merge
-	</form>
+			<h4>Merge Type: </h4>
+			<input type="radio" class="radio" name="merge-type" value="sum"> Sum
+			<input type="radio" class="radio" name="merge-type" value="dontmerge"> Don't Merge
+		</form>
 
-	<form id="node-file-upload">
-		<h1>Node File (Optional)</h1>
-		<input type="file" accept=".csv, .tsv" class="button" name="node-file" Value="Upload">
-	</form>
+		<form id="node-file-upload">
+			<h1>Node File (Optional)</h1>
+			<input type="file" accept=".csv, .tsv" class="button" id="upload-node-file" Value="Upload">
+		</form>
 
-	<input type="submit" id="create-tables" value="Create Tables">
-
-
-</div>
-
-<div id="data_page">
-	<!-- Navbar help: https://www.w3schools.com/bootstrap/bootstrap_navbar.asp -->
-	<nav class="navbar navbar-inverse">
-		<div class="container-fluid">
-			<ul class="nav navbar-nav">
-				<li id="return-to-uploads"><a href="#">Return to Uploads</a></li>
-				<li><a href="#">Save Data (.tsv)</a></li>
-				<li><a href="#">Save Data (.csv)</a></li>
-			</ul>
-		</div>
-	</nav>
+		<input type="submit" id="create-tables" value="Create Tables">
 
 
-</div>
+	</div>
+
+	<div id="data_page">
+		<!-- Navbar help: https://www.w3schools.com/bootstrap/bootstrap_navbar.asp -->
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<ul class="nav navbar-nav">
+					<li id="return-to-uploads"><a href="#">Return to Uploads</a></li>
+					<li><a href="#">Save Data (.tsv)</a></li>
+					<li><a href="#">Save Data (.csv)</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<table id="jsGrid" style="width:100%">
+			<tr>
+				<th>thing</th>
+				<th>another thing</th>
+			</tr>
+			<tr>
+				<td>name</td>
+				<td>another name</td>
+			</tr>
+			<tr>
+				<td>name</td>
+				<td>another name</td>
+			</tr>
+		</table>
+
+
+	</div>
+</body>
