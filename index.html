@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -42,7 +42,7 @@
     		$("#data_page").hide();
 
     		// Help with URL modification: https://stackoverflow.com/questions/38089507/how-to-change-url-after-success-in-ajax-without-page-reload
-    		window.history.pushState("", "Title", "/file-uploads");
+    		window.history.pushState("", "Title", "/~touellette/csc302_project");
     	};
 
     </script>
@@ -53,6 +53,10 @@
 	<form id="edge-file-upload">
 		<h1>Edge File (Required)</h1>
 		<input type="file" accept=".csv, .tsv" class="button" name="upload-edge-file" Value="Upload"><br>
+
+		<h4>Header? </h4>
+		<input type="radio" class="radio" name="header" value="yes"> Yes
+		<input type="radio" class="radio" name="header" value="no"> No <br>
 
 		<h4>Graph Type: </h4>
 		<input type="radio" class="radio" name="graph-type" value="undirect"> Undirected
@@ -74,7 +78,7 @@
 </div>
 
 <div id="data_page">
-	<!-- Navnar help: https://www.w3schools.com/bootstrap/bootstrap_navbar.asp -->
+	<!-- Navbar help: https://www.w3schools.com/bootstrap/bootstrap_navbar.asp -->
 	<nav class="navbar navbar-inverse">
 		<div class="container-fluid">
 			<ul class="nav navbar-nav">
