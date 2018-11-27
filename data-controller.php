@@ -1,5 +1,10 @@
 <?php
 
+	$routes = [
+		makeRoute("POST", "#^/edges/?(\?.*)?$#", handleEdges),
+		makeRoute("POST", "#^/nodes/?(\?.*)?$#", handleNodes)
+	];
+
 	function makeRoute($method, $pattern, $function){
 		return[
 			"method" => $method,
@@ -71,7 +76,83 @@
 	}
 	
 
-	function handleTables($data){
+	function handleEdges($data){
+		// Save all the edges to two array lists
+		// One for the first node, one for the second node
+	}
+
+	function handleNodes($data){
+		// Save all the nodes to an array list
+	}
+
+	// Basic Network Metrics
+	function calculateTotalNodes($data){
+		// Passed in parameter will be nodes list
+		// For loop through list, add one to variable every time 
+	}
+
+	function calculateTotalEdges($data){
+		// Passed in parameter will be edges lists
+		// For loop through list, add one to variable every time
+	}
+
+	function calculateUniqueEdges($data){
+		// Passed in parameter will be edges lists
+		// Add both edges to a list as one variable when it's not already in the list
+		// If a match is found in the list, remove it from the unique list and add it to
+		// a list of "already discovered" edges
+		// Add up the total number of variables in the unique list
+	}
+
+	function calculateMaxGeodesicDistance($data){
+
+	}
+
+	function calculateDensity($data){
+		// Potential connections: (n*(n-1))/2
+		// Actual connections: (calculateTotalNodes)
+		// Actual connections / potential connections
+
+	}
+
+	function calculateNumConnectedComponents($data){
+
+	}
+
+	function calculateAvgNodesAndEdgesAcrossConnectedComponents($data){
+
+	}
+
+	function calculateAvgInDegree($data){
+
+	}
+
+	function calculateAvgOutDegree($data){
+
+	}
+
+	function calculateAvgDegree($data){
+
+	}
+
+	//Per Node Metrics
+	function calculateInDegree($data){
+
+	}
+
+	function calculateOutDegree($data){
+
+	}
+
+	function calculateDegree($data){
+
+	}
+
+	function calculateBetweenessCentrality($data){
+
+	}
+
+	function calculateClosenessCentrality($data){
 
 	}
 
