@@ -8,14 +8,14 @@
 	<!-- Styles -->
     <link rel="stylesheet" href="normalize.css"/>
     <link rel="stylesheet" href="style.css"/>
+	
+	<!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <!-- jsGrid -->
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
 	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
-
-	<!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <!-- Boostrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -23,11 +23,16 @@
 
     <script>
 		
+		var edgeData = localStorage.getItem('edgeData');
+		var nodeData = localStorage.getItem('nodeData');
+
     	$(document).ready(function(){
 			$("#data_page").hide();
 
     		$(document).on('click', "#create-tables", createTables)
     		$(document).on('click', "#return-to-uploads", returnToUploads)
+    		document.getElementById('upload-edge-file').addEventListener('change', handleEdgeFileUpload, false)
+    		document.getElementById('upload-node-file').addEventListener('change', handleNodeFileUpload, false)
 
     	});
 
@@ -36,32 +41,7 @@
     		$("#file-uploads").hide();
     		$("#data_page").show();
 
-    		// $.ajax({
-    		// 	url: 'data-controller.php/edges',
-    		// 	mthod: 'post',
-    		// 	success: function(response){
-    		// 		var data = JSON.parse(response);
-    		// 	}
-    		// });
-
     		window.history.pushState("", "Title", "/data-tables");
-
-    		// File reading: https://stackoverflow.com/questions/750032/reading-file-contents-on-the-client-side-in-javascript-in-various-browsers
-    		var file = document.getElementById("upload-edge-file").files[0];
-    		console.log(file);
-    		// var edgesOutputData;
-			if (file) {
-			    var reader = new FileReader();
-			    var edgesOutputData = reader.readAsText(file, "UTF-8");
-			    console.log(edgesOutputData);
-			    reader.onload = function (evt) {
-			    	document.getElementById("upload-edge-file").innerHTML = evt.target.result;
-			    }
-			    reader.onerror = function (evt) {
-			        document.getElementById("upload-edge-file").innerHTML = "error reading file";
-			    }
-			}
-		    document.getElementById("p test").innerHTML = edgesOutputData;
     	};
 
     	var returnToUploads = function(event){
@@ -72,6 +52,37 @@
     		window.history.pushState("", "Title", "/~touellette/csc302_project");
     	};
 
+    	function handleEdgeFileUpload(event){
+    		var file = event.target.files[0];
+    		var reader = new FileReader();
+    		reader.onload = (function(theFile) {
+    			return function(e) {
+    				edgeData = e.target.result;// This is where the data is actually read
+    				localStorage.setItem('edgeData', edgeData);  
+    			};
+    		})(file);
+
+			console.log(localStorage.getItem('edgeData'));
+
+    		reader.readAsText(file);
+
+    	}
+
+    	function handleNodeFileUpload(event){
+    		var file = event.target.files[0];
+    		var reader = new FileReader();
+    		reader.onload = (function(theFile) {
+    			return function(e){
+    				nodeData = e.target.result; // This is where the data is actually read
+    				localStorage.setItem('nodeData', nodeData);
+    			};
+    		})(file);
+
+    		console.log(localStorage.getItem('nodeData'));
+
+    		reader.readAsText(file);
+    	}
+
     </script>
     
 </head>
@@ -80,7 +91,8 @@
 <div id="file-uploads">
 	<form id="edge-file-upload">
 		<h1>Edge File (Required)</h1>
-		<input type="file" accept=".csv, .tsv" class="button" id="upload-edge-file" Value="Upload"><br>
+		<input type="file" accept=".csv, .tsv" id="upload-edge-file" class="button" name=file" Value="Upload"/><br>
+		<output id="output thing"></output>
 
 		<h4>Header? </h4>
 		<input type="radio" class="radio" name="header" value="yes"> Yes
@@ -117,22 +129,56 @@
 		</div>
 	</nav>
 
-	<p id="p test">Hello</p>
-
-	<table id="jsGrid" style="width:100%">
-		<tr>
-			<th>thing</th>
-			<th>another thing</th>
-		</tr>
-		<tr>
-			<td>name</td>
-			<td>another name</td>
-		</tr>
-		<tr>
-			<td>name</td>
-			<td>another name</td>
-		</tr>
-	</table>
+	<div class="container">
+		<div class="col-lg-5">
+			<h2>Nodes and Edges Table</h2>
+			<input type="submit" id="edges-view" value="Edges View">
+			<input type="submit" id="nodes-view" value="Nodes View">
+			<div id="jsGrid"></div>
+		</div>
+		<div class="col-lg-7">
+			<h2>Network Statistics Table</h2>
+			<div id="jsGrid"></div>
+		</div>
+	</div>
 
 
 </div>
+
+<script>
+	    var clients = [
+	        { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
+	        { "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
+	        { "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
+	        { "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
+	        { "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
+	    ];
+	 
+	    var countries = [
+	        { Name: "", Id: 0 },
+	        { Name: "United States", Id: 1 },
+	        { Name: "Canada", Id: 2 },
+	        { Name: "United Kingdom", Id: 3 }
+	    ];
+	 
+	    $("#jsGrid").jsGrid({
+	        width: "100%",
+	        height: "400px",
+	 
+	        inserting: true,
+	        editing: true,
+	        sorting: true,
+	        paging: true,
+	 
+	        data: clients,
+	 
+	        fields: [
+	            { name: "Name", type: "text", width: 20, validate: "required" },
+	            { name: "Age", type: "number", width: 5 },
+	            { name: "Address", type: "text", width: 20 },
+	            { name: "Country", type: "select", width: 25, items: countries, valueField: "Id", textField: "Name" },
+	            { name: "Married", type: "checkbox", width:5, title: "Is Married", sorting: false },
+	            { type: "control", width:15 }
+	        ]
+	    });
+	</script>
