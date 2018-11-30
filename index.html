@@ -25,23 +25,66 @@
 		
 		var edgeData = localStorage.getItem('edgeData');
 		var nodeData = localStorage.getItem('nodeData');
+		var headerSetting = localStorage.getItem('headerSetting');
+		var graphTypeSetting = localStorage.getItem('graphTypeSetting');
+		var mergeTypeSetting = localStorage.getItem('mergeTypeSetting');
 
     	$(document).ready(function(){
 			$("#data_page").hide();
 
     		$(document).on('click', "#create-tables", createTables)
     		$(document).on('click', "#return-to-uploads", returnToUploads)
+
     		document.getElementById('upload-edge-file').addEventListener('change', handleEdgeFileUpload, false)
     		document.getElementById('upload-node-file').addEventListener('change', handleNodeFileUpload, false)
 
+    		document.getElementById('header-yes').addEventListener('change', handleHeaderYes, false)
+    		document.getElementById('header-no').addEventListener('change', handleHeaderNo, false)
+    		document.getElementById('graph-undirected').addEventListener('change', handleGraphUndirected, false)
+    		document.getElementById('graph-directed').addEventListener('change', handleGraphDirected, false)
+    		document.getElementById('merge-sum').addEventListener('change', handleMergeSum, false)
+    		document.getElementById('merge-dontmerge').addEventListener('change', handleMergeDontMerge, false)
+
+
     	});
 
-    	var createTables = function(event){
+    	var handleHeaderYes = function(event){localStorage.setItem('headerSetting', 'yes');}
+    	var handleHeaderNo = function(event){localStorage.setItem('headerSetting', 'no');}
+    	var handleGraphUndirected = function(event){localStorage.setItem('graphTypeSetting', 'undirected');}
+    	var handleGraphDirected = function(event){localStorage.setItem('graphTypeSetting', 'directed');}
+    	var handleMergeSum = function(event){localStorage.setItem('mergeTypeSetting', 'sum');}
+    	var handleMergeDontMerge = function(event){localStorage.setItem('mergeTypeSetting', 'dont merge');}
 
+    	var createTables = function(event){
     		$("#file-uploads").hide();
     		$("#data_page").show();
 
-    		window.history.pushState("", "Title", "/data-tables");
+    		$.ajax({
+    			url: 'data-controller.php/settings',
+    			method: 'post',
+    			data: {
+    				header: headerSetting,
+    				graphType: graphTypeSetting,
+    				mergeType: mergeTypeSetting,
+    				edge: edgeData,
+    				node: nodeData
+    			},
+    			success: (response)=>{
+    				console.log(response);
+    				var data = JSON.parse(response);
+    				if(data.success){
+    					alert(data.success);
+    				} else {
+    					alert(data.error);
+    				}
+    			},
+    			error: (xhr, status, error)=>{
+    				alert(error);
+    			}
+    		});
+
+    		event.preventDefault();
+    		// window.history.pushState("", "Title", "/~touellette/data_tables");
     	};
 
     	var returnToUploads = function(event){
@@ -62,8 +105,6 @@
     			};
     		})(file);
 
-			console.log(localStorage.getItem('edgeData'));
-
     		reader.readAsText(file);
 
     	}
@@ -77,8 +118,6 @@
     				localStorage.setItem('nodeData', nodeData);
     			};
     		})(file);
-
-    		console.log(localStorage.getItem('nodeData'));
 
     		reader.readAsText(file);
     	}
@@ -95,16 +134,16 @@
 		<output id="output thing"></output>
 
 		<h4>Header? </h4>
-		<input type="radio" class="radio" name="header" value="yes"> Yes
-		<input type="radio" class="radio" name="header" value="no"> No <br>
+		<input type="radio" id="header-yes" class="radio" name="header"> Yes
+		<input type="radio" id="header-no" class="radio" name="header"> No <br>
 
 		<h4>Graph Type: </h4>
-		<input type="radio" class="radio" name="graph-type" value="undirect"> Undirected
-		<input type="radio" class="radio" name="graph-type" value="direct"> Directed <br>
+		<input type="radio" id="graph-undirected" class="radio" name="graph-type"> Undirected
+		<input type="radio" id="graph-directed" class="radio" name="graph-type"> Directed <br>
 
 		<h4>Merge Type: </h4>
-		<input type="radio" class="radio" name="merge-type" value="sum"> Sum
-		<input type="radio" class="radio" name="merge-type" value="dontmerge"> Don't Merge
+		<input type="radio" id="merge-sum" class="radio" name="merge-type"> Sum
+		<input type="radio" id="merge-dontmerge" class="radio" name="merge-type"> Don't Merge
 	</form>
 
 	<form id="node-file-upload">

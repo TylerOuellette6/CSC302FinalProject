@@ -1,9 +1,40 @@
 <?php
 
+	$prefix = "/~touellette/csc302_projet/data-controller.php";
+
+	$dbName = "/home/touellette/csc302-fa18-data/final-project.db";
+	$dsn = "sqlite:$dbName";
+	$dbh = null;
+
 	$routes = [
-		makeRoute("POST", "#^/edges/?(\?.*)?$#", handleEdges),
-		makeRoute("POST", "#^/nodes/?(\?.*)?$#", handleNodes)
+		makeRoute("POST", "#^/settings/?(\?.*)?$#", handleBuildGraphButtonClick)
 	];
+
+	$uri = preg_replace("#^". $prefix ."/?#", "/", $_SERVER['REQUEST_URI']);
+
+	$method = $_SERVER["REQUEST_METHOD"];
+	$params = $_GET;
+	if($method == "POST"){
+		$params = "$_POST";
+		if(array_key_exists("_method", $_POST))
+			$method = $_POST["_method"];
+	}
+
+	$foundMatchingRoute = false;
+	$match = [];
+	foreach($routes as $route){
+	    if($method == $route["method"]){
+	        preg_match($route["pattern"], $uri, $match);
+	        if($match){
+	            die(json_encode($route["controller"]($uri, $match, $params)));
+	            $foundMatchingRoute = true;
+	        }
+	    }
+	}
+
+	if(!$foundMatchingRoute){
+	    echo "No route found for: $uri";
+	}
 
 	function makeRoute($method, $pattern, $function){
 		return[
@@ -12,10 +43,6 @@
 			"controller" => $function
 		];
 	}
-
-	$dbName = "/home/touellette/csc302-fa18-data/final-project.db";
-	$dsn = "sqlite:$dbName";
-	$dbh = null;
 
 	function connectToDB(){
 		global $dsn;
@@ -34,6 +61,18 @@
 	function setupDB(){
 		global $dbh;
 		try{
+			// Data settings
+			$dbh->exec(
+				"create table if not exists data_settings(".
+				"header text".
+				"graph_type text".
+				"merge_type text"
+			);
+			$error = $dbh->errorInfo();
+			if($error[0] !== '00000' && $error[0] !== '01000'){
+				die("There was an error setting up the network_data table: ". $error[2]);
+			}
+
 			//Entire network data table
 			$dbh->exec(
 				"create table if not exists network_data(".
@@ -49,7 +88,6 @@
 				"avg_out_degree real".
 				"avg_degree_in_and_out real)"
 			);
-
 			$error = $dbh->errorInfo();
 			if($error[0] !== '00000' && $error[0] !== '01000'){
 				die("There was an error setting up the network_data table: ". $error[2]);
@@ -64,7 +102,6 @@
 				"betweeness_centrality real".
 				"closeness_centrality real)"
 			);
-
 			$error = $dbh->errorInfo();
 			if($error[0] !== '00000' && $error[0] !== '01000'){
 				die("There was an error setting up the node_data table: ". $error[2]);
@@ -73,6 +110,16 @@
 		} catch(PDOException $e){
 			die("There was an error setting up the database: " $e->getMessage());
 		}
+	}
+
+	function handleBuildGraphButtonClick($data){
+		global $dbh;
+		connectToDB();
+	}
+
+	function handleGraphSettings($data){
+		
+
 	}
 	
 
