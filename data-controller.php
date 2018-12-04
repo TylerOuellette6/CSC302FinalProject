@@ -1,5 +1,8 @@
 <?php
 
+	error_reporting(E_ALL);
+	ini_set('display_errors', '1');
+
 	$prefix = "/~touellette/csc302_projet/data-controller.php";
 
 	$dbName = "/home/touellette/csc302-fa18-data/final-project.db";

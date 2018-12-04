@@ -35,11 +35,20 @@ header, body, footer, aside, nav, main, article, figure {
 	margin-left: 2%;
 	display: inline-block;
 }
+#file-uploads h5{
+	position: relative;
+	padding-left: 4em;
+	display: inline-block;
+}
 #file-uploads .radio{
 	position: relative;
 	margin-bottom: 1%;
 	margin-left: 2%;
 	display: inline-block;
+}
+#file-uploads label{
+	font-weight: none;
+	font-size: 80%;
 }
 #file-uploads #create-tables{
 	position: fixed;

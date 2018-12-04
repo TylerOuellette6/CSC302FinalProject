@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Data Editor</title>
+	<!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<!-- Styles -->
     <link rel="stylesheet" href="normalize.css"/>
     <link rel="stylesheet" href="style.css"/>
 	
-	<!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <!-- jsGrid -->
     <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
@@ -25,11 +25,14 @@
 		
 		var edgeData = localStorage.getItem('edgeData');
 		var nodeData = localStorage.getItem('nodeData');
+		var headers = localStorage.getItem('headers');
+
 		var headerSetting = localStorage.getItem('headerSetting');
 		var graphTypeSetting = localStorage.getItem('graphTypeSetting');
 		var mergeTypeSetting = localStorage.getItem('mergeTypeSetting');
 
     	$(document).ready(function(){
+    		localStorage.clear();
 			$("#data_page").hide();
 
     		$(document).on('click', "#create-tables", createTables)
@@ -48,7 +51,42 @@
 
     	});
 
-    	var handleHeaderYes = function(event){localStorage.setItem('headerSetting', 'yes');}
+    	var handleHeaderYes = function(event){
+    		localStorage.setItem('headerSetting', 'yes');
+    		var allDataArray = edgeData.split("\n");
+    		var justHeaders = allDataArray[0].split(",");
+    		localStorage.setItem('headers', justHeaders);
+
+    		var sourceSelection = document.getElementById("source-selection");
+    		var targetSelection = document.getElementById("target-selection");
+
+    		var sourceh5 = document.createElement("h5");
+    		sourceh5.innerHTML = "Source: ";
+    		sourceSelection.appendChild(sourceh5);
+
+    		var targeth5 = document.createElement("h5");
+    		targeth5.innerHTML = "Target: ";
+    		targetSelection.appendChild(targeth5);
+
+    		radioButtonMaker = function($vertex, $headerText, $divElement){
+    			var radioButton = document.createElement("input");
+	    		radioButton.setAttribute("type", "radio");
+	    		radioButton.setAttribute("id", $vertex + $headerText);
+	    		radioButton.setAttribute("class", "radio");
+
+	    		var radioButtonText = document.createElement("label");
+    			radioButtonText.innerHTML = $headerText;
+
+    			$divElement.appendChild(radioButton);
+    			$divElement.appendChild(radioButtonText);
+    		}
+
+    		var i;
+    		for(i=0; i<justHeaders.length; i++){
+    			radioButtonMaker("source", justHeaders[i], sourceSelection);
+    			radioButtonMaker("target", justHeaders[i], targetSelection);
+    		}
+    	}
     	var handleHeaderNo = function(event){localStorage.setItem('headerSetting', 'no');}
     	var handleGraphUndirected = function(event){localStorage.setItem('graphTypeSetting', 'undirected');}
     	var handleGraphDirected = function(event){localStorage.setItem('graphTypeSetting', 'directed');}
@@ -56,10 +94,7 @@
     	var handleMergeDontMerge = function(event){localStorage.setItem('mergeTypeSetting', 'dont merge');}
 
     	var createTables = function(event){
-    		$("#file-uploads").hide();
-    		$("#data_page").show();
-
-    		$.ajax({
+       		$.ajax({
     			url: 'data-controller.php/settings',
     			method: 'post',
     			data: {
@@ -69,19 +104,16 @@
     				edge: edgeData,
     				node: nodeData
     			},
-    			success: (response)=>{
-    				console.log(response);
-    				var data = JSON.parse(response);
-    				if(data.success){
-    					alert(data.success);
-    				} else {
-    					alert(data.error);
-    				}
+    			success: function(response){
+    				alert(response);
     			},
-    			error: (xhr, status, error)=>{
-    				alert(error);
+    			error: function(jqXHR, status, error){
+    				alert(jqXHR, status, error);
     			}
     		});
+
+    		$("#file-uploads").hide();
+    		$("#data_page").show();
 
     		event.preventDefault();
     		// window.history.pushState("", "Title", "/~touellette/data_tables");
@@ -136,6 +168,8 @@
 		<h4>Header? </h4>
 		<input type="radio" id="header-yes" class="radio" name="header"> Yes
 		<input type="radio" id="header-no" class="radio" name="header"> No <br>
+		<div id="source-selection"></div>
+		<div id="target-selection"></div>
 
 		<h4>Graph Type: </h4>
 		<input type="radio" id="graph-undirected" class="radio" name="graph-type"> Undirected
