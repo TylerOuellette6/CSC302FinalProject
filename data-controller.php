@@ -57,7 +57,7 @@
 				setupDB();
 			}
 		} catch(PDOException $e){
-			die("Could not establish connection to the database: " $e->getMessage());
+			die("Could not establish connection to the database: ". $e->getMessage());
 		}
 	}
 
@@ -111,7 +111,7 @@
 			}
 
 		} catch(PDOException $e){
-			die("There was an error setting up the database: " $e->getMessage());
+			die("There was an error setting up the database: ". $e->getMessage());
 		}
 	}
 
