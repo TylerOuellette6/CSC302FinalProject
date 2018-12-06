@@ -9,6 +9,9 @@ var headerSetting = localStorage.getItem('headerSetting');
 var graphTypeSetting = localStorage.getItem('graphTypeSetting');
 var mergeTypeSetting = localStorage.getItem('mergeTypeSetting');
 
+var sourceHeader = null;
+var targetHeader = null;
+
 $(document).ready(function(){
     localStorage.clear();
     $("#data_page").hide();
@@ -129,6 +132,9 @@ var handleSource = function(event){
         }
     }
 
+    sourceHeader = justHeaders[sourceIndex];
+
+    // sourceData = allSourceData;
     localStorage.setItem('sourceData', allSourceData);
 }
 
@@ -158,6 +164,9 @@ var handleTarget = function(event){
         }
     }
 
+    targetHeader = justHeaders[targetIndex];
+
+    targetData = allTargetData;
     localStorage.setItem('targetData', allTargetData);
 }
 
@@ -183,6 +192,40 @@ var createTables = function(event){
 
     $("#file-uploads").hide();
     $("#data_page").show();
+
+    edgesGridData = [];
+
+    var justSourceData = localStorage.getItem('sourceData').split(",");
+    var justTargetData = localStorage.getItem('targetData').split(",");
+    for(var i=0; i<justSourceData.length; i++){
+        edgesGridData.push({sourceHeader: justSourceData[i], targetHeader: justTargetData[i]});
+    }
+
+    $("#edgesGrid").jsGrid({
+        width: "100%",
+        height: "100%",
+
+        sorting: true,
+        paging: true,
+
+        data: edgesGridData,
+
+        fields: [
+            { name: sourceHeader, type: "text"}, 
+            { name: targetHeader, type: "text"}
+        ]
+    });
+
+    $("#networkStatsGrid").jsGrid({
+        width: "100%",
+        height: "100%",
+
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+        
+    });
 
     event.preventDefault();
     // window.history.pushState("", "Title", "/~touellette/data_tables");
@@ -225,42 +268,14 @@ function handleNodeFileUpload(event){
 
 
 var clients = [
-        { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
-        { "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
-        { "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
-        { "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
-        { "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
-    ];
- 
-var countries = [
-    { Name: "", Id: 0 },
-    { Name: "United States", Id: 1 },
-    { Name: "Canada", Id: 2 },
-    { Name: "United Kingdom", Id: 3 }
+    { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
+    { "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
+    { "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
+    { "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
+    { "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
 ];
 
 
 
-$("#jsGrid").jsGrid({
-    width: "100%",
-    height: "400px",
 
-    inserting: true,
-    editing: true,
-    sorting: true,
-    paging: true,
 
-    data: clients,
-
-    for(i=0, i<justHeaders.length, i++)
-
-    
-    fields: [
-        { name: justHeaders[0], type: "text", width: 20, validate: "required" },
-        { name: "Age", type: "number", width: 5 },
-        { name: "Address", type: "text", width: 20 },
-        { name: "Country", type: "select", width: 25, items: countries, valueField: "Id", textField: "Name" },
-        { name: "Married", type: "checkbox", width:5, title: "Is Married", sorting: false },
-        { type: "control", width:15 }
-    ]
-});
