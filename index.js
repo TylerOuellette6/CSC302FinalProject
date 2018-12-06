@@ -14,7 +14,6 @@ var targetHeader = null;
 
 $(document).ready(function(){
     localStorage.clear();
-    $("#data_page").hide();
 
     $(document).on('click', "#create-tables", createTables)
     $(document).on('click', "#return-to-uploads", returnToUploads)
@@ -28,6 +27,9 @@ $(document).ready(function(){
     document.getElementById('graph-directed').addEventListener('change', handleGraphDirected, false)
     document.getElementById('merge-sum').addEventListener('change', handleMergeSum, false)
     document.getElementById('merge-dontmerge').addEventListener('change', handleMergeDontMerge, false)
+
+    $(document).on('click', "#nodes-view", showNodesTable)
+    $(document).on('click', "#edges-view", showEdgesTable)
 
 });
 
@@ -194,7 +196,6 @@ var createTables = function(event){
     $("#data_page").show();
 
     edgesGridData = [];
-
     var justSourceData = localStorage.getItem('sourceData').split(",");
     var justTargetData = localStorage.getItem('targetData').split(",");
     for(var i=0; i<justSourceData.length; i++){
@@ -203,7 +204,7 @@ var createTables = function(event){
 
     $("#edgesGrid").jsGrid({
         width: "100%",
-        height: "100%",
+        height: "auto",
 
         sorting: true,
         paging: true,
@@ -216,14 +217,43 @@ var createTables = function(event){
         ]
     });
 
-    $("#networkStatsGrid").jsGrid({
+    $("#nodesGrid").jsGrid({
         width: "100%",
-        height: "100%",
+        height: "auto",
 
-        inserting: true,
-        editing: true,
         sorting: true,
         paging: true,
+
+        fields: [
+            {name: "Node", type: "text"},
+            {name: "In-Degree", type: "number"},
+            {name: "Out-Degree", type: "number"},
+            {name: "Degree (In + Out)", type: "number"},
+            {name: "Betweeness Centrality", type: "number"},
+            {name: "Closeness Centrality", type: "number"}            
+        ]
+    });
+
+    $("#networkStatsGrid").jsGrid({
+        width: "100%",
+        height: "auto",
+
+        sorting: true,
+        paging: true,
+
+        fields: [
+            {name: "Total Nodes", type: "number"},
+            {name: "Total Edges", type: "number"},
+            {name: "Unique Edges", type: "number"},
+            {name: "Max. Geodesic Distance (Diameter)", type: "number"},
+            {name: "Avg. Geodesic Distance", type: "number"},
+            {name: "Density", type: "number"}, 
+            {name: "Num Connected Components", type: "number"},
+            {name: "Avg. Num Nodes + Edges Across Connected Components", type: "number"},
+            {name: "Avg. In-Degree", type: "number"},
+            {name: "Avg Out-Degree", type: "number"},
+            {name: "Avg. Degree (In + Out)", type: "number"}
+        ]
         
     });
 
@@ -266,6 +296,18 @@ function handleNodeFileUpload(event){
     reader.readAsText(file);
 }
 
+function showNodesTable(event){
+    $("#nodesGrid").show();
+    $("#nodes-view").prop("disabled", true);
+    $("#edgesGrid").hide();
+    $("#edges-view").prop("disabled", false);
+}
+function showEdgesTable(event){
+    $("#edgesGrid").show();
+    $("#edges-view").prop("disabled", true);
+    $("#nodesGrid").hide();
+    $("#nodes-view").prop("disabled", false);
+}
 
 var clients = [
     { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
