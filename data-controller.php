@@ -1,16 +1,13 @@
 <?php
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', '1');
-
-	$prefix = "/~touellette/csc302_projet/data-controller.php";
+	$prefix = "/~touellette/csc302_project/data-controller.php";
 
 	$dbName = "/home/touellette/csc302-fa18-data/final-project.db";
 	$dsn = "sqlite:$dbName";
 	$dbh = null;
 
 	$routes = [
-		makeRoute("POST", "#^/settings/?(\?.*)?$#", handleBuildGraphButtonClick)
+		makeRoute("POST", "#^/settings/?(\?.*)?$#", "handleBuildGraphButtonClick")
 	];
 
 	$uri = preg_replace("#^". $prefix ."/?#", "/", $_SERVER['REQUEST_URI']);
@@ -18,7 +15,7 @@
 	$method = $_SERVER["REQUEST_METHOD"];
 	$params = $_GET;
 	if($method == "POST"){
-		$params = "$_POST";
+		$params = $_POST;
 		if(array_key_exists("_method", $_POST))
 			$method = $_POST["_method"];
 	}
@@ -69,11 +66,11 @@
 				"create table if not exists data_settings(".
 				"header text".
 				"graph_type text".
-				"merge_type text"
+				"merge_type text)"
 			);
 			$error = $dbh->errorInfo();
 			if($error[0] !== '00000' && $error[0] !== '01000'){
-				die("There was an error setting up the network_data table: ". $error[2]);
+				die("There was an error setting up the data_settings table: ". $error[2]);
 			}
 
 			//Entire network data table
@@ -98,7 +95,7 @@
 
 			//Node data table, per node 
 			$dbh->exec(
-				"create table if not exists node_data".
+				"create table if not exists node_data(".
 				"in_degree real".
 				"out_degree real".
 				"degree_in_and_out real".
@@ -118,13 +115,29 @@
 	function handleBuildGraphButtonClick($data){
 		global $dbh;
 		connectToDB();
-	}
 
-	function handleGraphSettings($data){
-		
+		try{
+			$statement = $dbh->prepare(
+				"insert into data_settings".
+				"(header, graph_type, merge_type)".
+				"values(:header, :graphType, :mergeType)");
 
-	}
-	
+			$success = $statement->execute(array(
+				":header" => $data["header"],
+				":graphType" => $data["graphType"],
+				":mergeType" => $data["mergeType"]
+			));
+
+			if(!success){
+				die("There was an error saving to the database: " . $dbh->errorInfo()[2]);
+			}
+		} catch(PDOException $e){
+			die("There was an error saving to the database: ". $e->getMessage());
+		}
+
+		$testHeaders = $dbh->prepare('select header from data_settings');
+		echo $testHeaders;
+	}	
 
 	function handleEdges($data){
 		// Save all the edges to two array lists
@@ -187,14 +200,19 @@
 
 	//Per Node Metrics
 	function calculateInDegree($data){
-
+		// Only done if graph is directed!!
+		// Count the number of nodes that connect IN to the given node
 	}
 
 	function calculateOutDegree($data){
+		// Only done if graph is directed!!
+		// Count the number of nodes that connect OUT to the given node
 
 	}
 
 	function calculateDegree($data){
+		// If directed: Add in and out degree
+		// If undirected, count number of nodes that go in and out of the given node
 
 	}
 

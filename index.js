@@ -36,8 +36,6 @@ $(document).ready(function(){
 var handleHeaderYes = function(event){
     var fileName = document.getElementById('upload-edge-file').files[0].name;
     var fileType = fileName.slice(-3);
-    // console.log(fileName);
-    // console.log(fileType);
     if(fileType === "tsv"){
         var newEdgeData = edgeData.replace(/\t/g, ",");
         localStorage.setItem('edgeData', newEdgeData);
@@ -88,20 +86,59 @@ var handleHeaderYes = function(event){
         document.getElementById('target-'+justHeaders[i]).addEventListener('change', handleTarget, false)
     }
 }
+
 var handleHeaderNo = function(event){
+    var fileName = document.getElementById('upload-edge-file').files[0].name;
+    var fileType = fileName.slice(-3);
+    if(fileType === "tsv"){
+        var newEdgeData = edgeData.replace(/\t/g, ",");
+        localStorage.setItem('edgeData', newEdgeData);
+        edgeData = localStorage.getItem('edgeData');
+    }
+
     localStorage.setItem('headerSetting', 'no');
 
-    var justHeadersStorage = localStorage.getItem('headers');
-    var justHeaders = justHeadersStorage.split(",");
+    var allDataArray = edgeData.split("\n");
+    var firstRow = allDataArray[0].split(",");
+    for(var i=0; i<firstRow.length; i++){firstRow[i] = firstRow[i].replace(/\s+/g, '');}
+    localStorage.setItem('headers', firstRow);
 
-    for(var i=0; i<justHeaders.length; i++){
-        document.getElementById("source-" + justHeaders[i]).remove();
-        document.getElementById("source-" + justHeaders[i] + "label").remove();
-        document.getElementById("target-" + justHeaders[i]).remove();
-        document.getElementById("target-" + justHeaders[i] + "label").remove();
+    var sourceSelection = document.getElementById("source-selection");
+    var targetSelection = document.getElementById("target-selection");
+
+    var sourceh5 = document.createElement("h5");
+    sourceh5.innerHTML = "Source: ";
+    sourceh5.setAttribute("id", "sourceh5");
+    sourceSelection.appendChild(sourceh5);
+
+    var targeth5 = document.createElement("h5");
+    targeth5.innerHTML = "Target: ";
+    targeth5.setAttribute("id", "targeth5");
+    targetSelection.appendChild(targeth5);
+
+    radioButtonMaker = function($vertex, $firstRow, $divElement, $number){
+        var radioButton = document.createElement("input");
+        radioButton.setAttribute("type", "radio");
+        radioButton.setAttribute("id", $vertex + "-" + $firstRow);
+        radioButton.setAttribute("class", "radio");
+
+        var radioButtonText = document.createElement("label");
+        radioButtonText.setAttribute("id", $vertex + "-" + $firstRow + "label")
+        radioButtonText.innerHTML = "Column " + $number;
+
+        $divElement.appendChild(radioButton);
+        $divElement.appendChild(radioButtonText);
     }
-    document.getElementById("sourceh5").remove();
-    document.getElementById("targeth5").remove();
+
+    for(var i=0; i<firstRow.length; i++){
+        radioButtonMaker("source", firstRow[i], sourceSelection, i);
+        radioButtonMaker("target", firstRow[i], targetSelection, i);
+    }
+
+    for(var i=0; i<firstRow.length; i++){
+        document.getElementById('source-'+firstRow[i]).addEventListener('change', handleSource, false)
+        document.getElementById('target-'+firstRow[i]).addEventListener('change', handleTarget, false)
+    }
 }
 var handleGraphUndirected = function(event){localStorage.setItem('graphTypeSetting', 'undirected');}
 var handleGraphDirected = function(event){localStorage.setItem('graphTypeSetting', 'directed');}
@@ -135,6 +172,7 @@ var handleSource = function(event){
     }
 
     sourceHeader = justHeaders[sourceIndex];
+    localStorage.setItem('sourceHeader', justHeaders[sourceIndex]);
 
     // sourceData = allSourceData;
     localStorage.setItem('sourceData', allSourceData);
@@ -185,7 +223,7 @@ var createTables = function(event){
             node: nodeData
         },
         success: function( response){
-            // alert(response);
+            alert(response);
         },
         error: function(jqXHR, status, error){
             // alert(jqXHR, status, error);
@@ -199,7 +237,10 @@ var createTables = function(event){
     var justSourceData = localStorage.getItem('sourceData').split(",");
     var justTargetData = localStorage.getItem('targetData').split(",");
     for(var i=0; i<justSourceData.length; i++){
-        edgesGridData.push({sourceHeader: justSourceData[i], targetHeader: justTargetData[i]});
+        var data = {};
+        data[sourceHeader] = justSourceData[i];
+        data[targetHeader] = justTargetData[i];
+        edgesGridData.push(data);
     }
 
     $("#edgesGrid").jsGrid({
