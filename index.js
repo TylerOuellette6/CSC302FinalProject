@@ -172,7 +172,6 @@ var handleSource = function(event){
     }
 
     sourceHeader = justHeaders[sourceIndex];
-    localStorage.setItem('sourceHeader', justHeaders[sourceIndex]);
 
     // sourceData = allSourceData;
     localStorage.setItem('sourceData', allSourceData);
@@ -211,6 +210,31 @@ var handleTarget = function(event){
 }
 
 var createTables = function(event){
+    $("#file-uploads").hide();
+    $("#data_page").show();
+
+    var justSourceData = localStorage.getItem('sourceData').split(",");
+    var justTargetData = localStorage.getItem('targetData').split(",");
+
+    // This makes an array of Nodes if one wasn't already made by uploading a node file
+    if(localStorage.getItem('nodeData') === null){
+        allNodeData = [];
+        for(var i=0; i<justSourceData.length; i++){
+            // How to add non-dupes to array: 
+            // https://stackoverflow.com/questions/10757516/how-to-prevent-adding-duplicate-keys-to-a-javascript-array
+            if($.inArray(justSourceData[i], allNodeData)==-1){
+                allNodeData.push(justSourceData[i]);
+            }
+        }
+        for(var i=0; i<justTargetData.length; i++){
+            if($.inArray(justTargetData[i], allNodeData)==-1){
+                allNodeData.push(justTargetData[i]);
+            }
+        }
+        nodeData = allNodeData;
+        localStorage.setItem('nodeData', allNodeData);
+    }
+
     $.ajax({
         url: 'data-controller.php/settings',
         method: 'post',
@@ -223,26 +247,21 @@ var createTables = function(event){
             node: nodeData
         },
         success: function( response){
-            alert(response);
+            // alert(response);
         },
         error: function(jqXHR, status, error){
             // alert(jqXHR, status, error);
         }
     });
 
-    $("#file-uploads").hide();
-    $("#data_page").show();
-
+    // Populates the edge table
     edgesGridData = [];
-    var justSourceData = localStorage.getItem('sourceData').split(",");
-    var justTargetData = localStorage.getItem('targetData').split(",");
     for(var i=0; i<justSourceData.length; i++){
-        var data = {};
-        data[sourceHeader] = justSourceData[i];
-        data[targetHeader] = justTargetData[i];
-        edgesGridData.push(data);
+        var dataForEdges = {};
+        dataForEdges[sourceHeader] = justSourceData[i];
+        dataForEdges[targetHeader] = justTargetData[i];
+        edgesGridData.push(dataForEdges);
     }
-
     $("#edgesGrid").jsGrid({
         width: "100%",
         height: "auto",
@@ -258,12 +277,24 @@ var createTables = function(event){
         ]
     });
 
+    nodesGridData = [];
+    var justNodeData = localStorage.getItem('nodeData').split(",");
+    for(var i=0; i<justNodeData.length; i++){
+        var dataForNodes = {};
+        dataForNodes["Node"] = justNodeData[i];
+        dataForNodes["In-Degree"] = calculateInDegree(justNodeData[i], justTargetData, localStorage.getItem('graphTypeSetting'));
+        dataForNodes["Out-Degree"] = calculateOutDegree(justNodeData[i], justSourceData, localStorage.getItem('graphTypeSetting'));
+        dataForNodes["Degree (In + Out)"] = calculateDegree(justNodeData[i], justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'));
+        nodesGridData.push(dataForNodes);
+    }
     $("#nodesGrid").jsGrid({
         width: "100%",
         height: "auto",
 
         sorting: true,
         paging: true,
+
+        data: nodesGridData,
 
         fields: [
             {name: "Node", type: "text"},
@@ -275,6 +306,22 @@ var createTables = function(event){
         ]
     });
 
+    networkStatsGridData = [
+        {
+            "Total Nodes" : calculateTotalNodes(justNodeData),
+            "Total Edges" : calculateTotalEdges(justSourceData), 
+            "Unique Edges" : 0,
+            "Max Geodesic Distance (Diameter)" : 0,
+            "Avg Geodesic Distance" : 0,
+            "Density" : 0,
+            "Num Connected Components" : 0,
+            "Avg Num Nodes + Edges Across Connected Components" : 0,
+            "Avg In-Degree" : calculateAvgInDegree(justNodeData, justTargetData, localStorage.getItem('graphTypeSetting')),
+            "Avg Out-Degree" : calculateAvgOutDegree(justNodeData, justSourceData, localStorage.getItem('graphTypeSetting')),
+            "Avg Degree (In + Out)" : calculateAvgDegree(justNodeData, justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'))
+        }
+    ];
+
     $("#networkStatsGrid").jsGrid({
         width: "100%",
         height: "auto",
@@ -282,18 +329,20 @@ var createTables = function(event){
         sorting: true,
         paging: true,
 
+        data: networkStatsGridData,
+
         fields: [
             {name: "Total Nodes", type: "number"},
             {name: "Total Edges", type: "number"},
             {name: "Unique Edges", type: "number"},
-            {name: "Max. Geodesic Distance (Diameter)", type: "number"},
-            {name: "Avg. Geodesic Distance", type: "number"},
+            {name: "Max Geodesic Distance (Diameter)", type: "number"},
+            {name: "Avg Geodesic Distance", type: "number"},
             {name: "Density", type: "number"}, 
             {name: "Num Connected Components", type: "number"},
-            {name: "Avg. Num Nodes + Edges Across Connected Components", type: "number"},
-            {name: "Avg. In-Degree", type: "number"},
+            {name: "Avg Num Nodes + Edges Across Connected Components", type: "number"},
+            {name: "Avg In-Degree", type: "number"},
             {name: "Avg Out-Degree", type: "number"},
-            {name: "Avg. Degree (In + Out)", type: "number"}
+            {name: "Avg Degree (In + Out)", type: "number"}
         ]
         
     });
@@ -301,6 +350,106 @@ var createTables = function(event){
     event.preventDefault();
     // window.history.pushState("", "Title", "/~touellette/data_tables");
 };
+
+// Entire Network Metrics
+function calculateTotalNodes(nodes){
+    return nodes.length;
+}
+function calculateTotalEdges(sources){
+    // Only needs source since there's never going to be more sources than targets and vice versa
+    return sources.length;
+}
+function calculateUniqueEdges(sources, targets){
+
+}
+function calculateMaxGeodesicDistance(){
+
+}
+function calculateAvgGeodesicDistance(){
+
+}
+function calculateDensity(){
+
+}
+function calculateNumConnectedComponents(){
+
+}
+function calculateAvgNumNodesEdgesAcrossConnectedComponents(){
+
+}
+function calculateAvgInDegree(nodes, targets, graphType){
+    var totalInDegree = 0;
+    var numNodes = nodes.length;
+    if(graphType === "directed"){
+        for(var i=0; i<nodes.length; i++){
+            totalInDegree += calculateInDegree(nodes[i], targets, graphType);
+        }
+    }
+
+    return (totalInDegree/numNodes).toFixed(4);
+}
+function calculateAvgOutDegree(nodes, sources, graphType){
+    var totalOutDegree = 0;
+    var numNodes = nodes.length;
+    if(graphType === "directed"){
+        for(var i=0; i<nodes.length; i++){
+            totalOutDegree += calculateOutDegree(nodes[i], sources, graphType);
+        }
+    }
+
+    return (totalOutDegree/numNodes).toFixed(4);
+}
+function calculateAvgDegree(nodes, sources, targets, graphType){
+    var totalDegree = 0;
+    var numNodes = nodes.length;
+    for(var i=0; i<nodes.length; i++){
+        totalDegree += calculateDegree(nodes[i], sources, targets, graphType);
+    }
+
+    return (totalDegree/numNodes).toFixed(4);
+}
+
+// Per Node Metrics
+function calculateInDegree(node, targets, graphType){
+    var inDegree = 0;
+    if(graphType === "directed"){
+        for(var i=0; i<targets.length; i++){
+            if(targets[i] === node){
+                inDegree += 1;
+            }
+        }
+    }
+    return inDegree;
+}
+function calculateOutDegree(node, sources, graphType){
+    var outDegree = 0;
+    if(graphType === "directed"){
+        for(var i=0; i<sources.length; i++){
+            if(sources[i] === node){
+                outDegree += 1;
+            }
+        }
+    }
+    return outDegree;
+}
+function calculateDegree(node, sources, targets, graphType){
+    var degree = 0;
+    if(graphType === "directed"){
+        degree += calculateInDegree(node, targets, graphType);
+        degree += calculateOutDegree(node, sources, graphType);
+    }
+    else{
+
+    }
+
+    return degree;
+}
+function calculateBetweenessCentrality(){
+
+}
+function calculateClosenessCentrality(){
+
+}
 
 var returnToUploads = function(event){
     $("#file-uploads").show();
@@ -349,14 +498,6 @@ function showEdgesTable(event){
     $("#nodesGrid").hide();
     $("#nodes-view").prop("disabled", false);
 }
-
-var clients = [
-    { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
-    { "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
-    { "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
-    { "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
-    { "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
-];
 
 
 

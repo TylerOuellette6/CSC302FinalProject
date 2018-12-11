@@ -122,21 +122,18 @@
 				"(header, graph_type, merge_type)".
 				"values(:header, :graphType, :mergeType)");
 
-			$success = $statement->execute(array(
-				":header" => $data["header"],
-				":graphType" => $data["graphType"],
-				":mergeType" => $data["mergeType"]
-			));
+			// $success = $statement->execute(array(
+			// 	":header" => $data["header"],
+			// 	":graphType" => $data["graphType"],
+			// 	":mergeType" => $data["mergeType"]
+			// ));
 
-			if(!success){
-				die("There was an error saving to the database: " . $dbh->errorInfo()[2]);
-			}
+			// if(!success){
+			// 	die("There was an error saving to the database: " . $dbh->errorInfo()[2]);
+			// }
 		} catch(PDOException $e){
-			die("There was an error saving to the database: ". $e->getMessage());
+			// die("There was an error saving to the database: ". $e->getMessage());
 		}
-
-		$testHeaders = $dbh->prepare('select header from data_settings');
-		echo $testHeaders;
 	}	
 
 	function handleEdges($data){
