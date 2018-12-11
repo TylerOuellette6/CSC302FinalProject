@@ -384,7 +384,7 @@ var createTables = function(event){
             "Unique Edges" : 0,
             "Max Geodesic Distance (Diameter)" : 0,
             "Avg Geodesic Distance" : 0,
-            "Density" : 0,
+            "Density" : calculateDensity(justSourceData, justNodeData),
             "Num Connected Components" : 0,
             "Avg Num Nodes + Edges Across Connected Components" : 0,
             "Avg In-Degree" : calculateAvgInDegree(justNodeData, justTargetData, localStorage.getItem('graphTypeSetting')),
@@ -491,8 +491,17 @@ function calculateMaxGeodesicDistance(){
 function calculateAvgGeodesicDistance(){
 
 }
-function calculateDensity(){
+function calculateDensity(sources, nodes){
+    var numEdges = calculateTotalEdges(sources);
+    var numNodes = calculateTotalNodes(nodes);
 
+    // Equation(s) for Density:
+    // Actual Connections (Edges) / Potential Connections
+    // Potential Connections = (numNodes * (numNodes - 1))/ 2
+    var pc = (numNodes * (numNodes-1))/2;
+    var density = numEdges / pc;
+
+    return density;
 }
 function calculateNumConnectedComponents(){
 
@@ -542,7 +551,7 @@ function calculateInDegree(node, targets, graphType){
             }
         }
     }
-    return inDegree;
+    return inDegree.toFixed(6);
 }
 function calculateOutDegree(node, sources, graphType){
     var outDegree = 0;
