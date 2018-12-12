@@ -17,7 +17,8 @@ var sourceHeader = null;
 var targetHeader = null;
 
 // Array of all the data that will be written out to a file
-var dataToSave = [];
+var nodeDataToSave = [];
+var networkDataToSave = [];
 
 $(document).ready(function(){
     localStorage.clear();
@@ -354,13 +355,12 @@ var createTables = function(event){
     nodesGridData = [];
     var justNodeData = localStorage.getItem('nodeData').split(",");
     // Populate the data to save with the Node Headers
-    dataToSave.push("Node", "In-Degree", "Out-Degree", "Degree", "Betweeness Centrality", "Closeness Centrality\n");
-    console.log(dataToSave);
+    nodeDataToSave.push("Node", "In-Degree", "Out-Degree", "Degree", "Betweeness Centrality", "Closeness Centrality\n");
     // Goes through all the nodes and does calculations on all of them
     for(var i=0; i<justNodeData.length; i++){
         var dataForNodes = {};
         dataForNodes["Node"] = justNodeData[i];
-        dataToSave.push(justNodeData[i]);
+        nodeDataToSave.push(justNodeData[i]);
         dataForNodes["In-Degree"] = calculateInDegree(justNodeData[i], justTargetData, localStorage.getItem('graphTypeSetting'), true);
         dataForNodes["Out-Degree"] = calculateOutDegree(justNodeData[i], justSourceData, localStorage.getItem('graphTypeSetting'), true);
         dataForNodes["Degree (In + Out)"] = calculateDegree(justNodeData[i], justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'), true);
@@ -388,17 +388,22 @@ var createTables = function(event){
         ]
     });
 
+    // Populate the data to save with the Network Stats Headers
+    networkDataToSave.push("\nTotal Nodes", "Total Edges", "Unique Edges", "Diameter", 
+        "Avg Geodesic Distance", "Density", "Num Connected Components", 
+        "Avg Num Nodes Across Connected Components", "Avg In-Degree", "Avg Out-Degree",
+        "Avg Degree");
     // Populates the network statistics table
     networkStatsGridData = [
         {
             "Total Nodes" : calculateTotalNodes(justNodeData),
             "Total Edges" : calculateTotalEdges(justSourceData), 
-            "Unique Edges" : 0,
-            "Max Geodesic Distance (Diameter)" : 0,
-            "Avg Geodesic Distance" : 0,
+            "Unique Edges" : calculateUniqueEdges(),
+            "Max Geodesic Distance (Diameter)" : calculateMaxGeodesicDistance(),
+            "Avg Geodesic Distance" : calculateAvgGeodesicDistance(),
             "Density" : calculateDensity(justSourceData, justNodeData),
-            "Num Connected Components" : 0,
-            "Avg Num Nodes + Edges Across Connected Components" : 0,
+            "Num Connected Components" : calculateNumConnectedComponents(),
+            "Avg Num Nodes + Edges Across Connected Components" : calculateAvgNumNodesEdgesAcrossConnectedComponents(),
             "Avg In-Degree" : calculateAvgInDegree(justNodeData, justTargetData, localStorage.getItem('graphTypeSetting')),
             "Avg Out-Degree" : calculateAvgOutDegree(justNodeData, justSourceData, localStorage.getItem('graphTypeSetting')),
             "Avg Degree (In + Out)" : calculateAvgDegree(justNodeData, justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'))
@@ -486,33 +491,58 @@ function showEdgesTable(event){
 
 function saveAsTSV(){
     var zip = new JSZip();
-    zip.file("hello.tsv", dataToSave.toString());
+    // Convert commas to tabs
+    var tabbedNodeData = nodeDataToSave.toString().replace(/,/g, "\t");
+    var tabbedNetworkData = networkDataToSave.toString().replace(/,/g, "\t");
+    // Create the files with the data
+    zip.file("node-data.tsv", tabbedNodeData.toString());
+    zip.file("network-data.tsv", tabbedNetworkData.toString());
 
+    // Save the files in the ZIP
     zip.generateAsync({type:"blob"}).then(function(blob) {
-        saveAs(blob, "hello.zip");
+        saveAs(blob, "all-data.zip");
     });
 }
 function saveAsCSV(){
+    var zip = new JSZip();
+    // Create the files with the data
+    zip.file("node-data.csv", nodeDataToSave.toString());
+    zip.file("network-data.csv", networkDataToSave.toString());
 
+    // Save the files in the ZIP
+    zip.generateAsync({type:"blob"}).then(function(blob) {
+        saveAs(blob, "all-data.zip");
+    });
 }
 
 // Calculations
 // Entire Network Metrics
 function calculateTotalNodes(nodes){
+    networkDataToSave.push(nodes.length);
     return nodes.length;
 }
 function calculateTotalEdges(sources){
+    networkDataToSave.push(sources.length);
     // Only needs source since there's never going to be more sources than targets and vice versa
     return sources.length;
 }
 function calculateUniqueEdges(sources, targets, graphType){
+    var uniqueEdges = 0;
 
+    networkDataToSave.push(uniqueEdges);
+    return uniqueEdges;
 }
 function calculateMaxGeodesicDistance(){
+    var diameter = 0;
 
+    networkDataToSave.push(diameter);
+    return diameter;
 }
 function calculateAvgGeodesicDistance(){
+    var avgGeodesicDistance = 0;
 
+    networkDataToSave.push(avgGeodesicDistance);
+    return avgGeodesicDistance;
 }
 function calculateDensity(sources, nodes){
     var numEdges = calculateTotalEdges(sources);
@@ -524,13 +554,20 @@ function calculateDensity(sources, nodes){
     var pc = (numNodes * (numNodes-1))/2;
     var density = numEdges / pc;
 
+    networkDataToSave.push(density);
     return density.toFixed(6);
 }
 function calculateNumConnectedComponents(){
+    var numComponents = 0;
 
+    networkDataToSave.push(numComponents);
+    return numComponents;
 }
 function calculateAvgNumNodesEdgesAcrossConnectedComponents(){
+    var avgNumNodesPerComponent = 0
 
+    networkDataToSave.push(avgNumNodesPerComponent);
+    return avgNumNodesPerComponent;
 }
 function calculateAvgInDegree(nodes, targets, graphType){
     var totalInDegree = 0;
@@ -541,6 +578,7 @@ function calculateAvgInDegree(nodes, targets, graphType){
         }
     }
 
+    networkDataToSave.push(totalInDegree/numNodes);
     return (totalInDegree/numNodes).toFixed(4);
 }
 function calculateAvgOutDegree(nodes, sources, graphType){
@@ -552,6 +590,7 @@ function calculateAvgOutDegree(nodes, sources, graphType){
         }
     }
 
+    networkDataToSave.push(totalOutDegree/numNodes);
     return (totalOutDegree/numNodes).toFixed(4);
 }
 function calculateAvgDegree(nodes, sources, targets, graphType){
@@ -561,6 +600,7 @@ function calculateAvgDegree(nodes, sources, targets, graphType){
         totalDegree += calculateDegree(nodes[i], sources, targets, graphType, false);
     }
 
+    networkDataToSave.push(totalDegree/numNodes);
     return (totalDegree/numNodes).toFixed(4);
 }
 
@@ -574,7 +614,7 @@ function calculateInDegree(node, targets, graphType, firstTime){
             }
         }
     }
-    if(firstTime){dataToSave.push(inDegree);}
+    if(firstTime){nodeDataToSave.push(inDegree);}
     return inDegree;
 }
 function calculateOutDegree(node, sources, graphType, firstTime){
@@ -586,7 +626,7 @@ function calculateOutDegree(node, sources, graphType, firstTime){
             }
         }
     }
-    if(firstTime){dataToSave.push(outDegree);}
+    if(firstTime){nodeDataToSave.push(outDegree);}
     return outDegree;
 }
 function calculateDegree(node, sources, targets, graphType, firstTime){
@@ -605,18 +645,18 @@ function calculateDegree(node, sources, targets, graphType, firstTime){
             }
         }
     }
-    if(firstTime){dataToSave.push(degree);}
+    if(firstTime){nodeDataToSave.push(degree);}
     return degree;
 }
 function calculateBetweenessCentrality(){
     var betweeness = 0;
 
-    dataToSave.push(betweeness);
+    nodeDataToSave.push(betweeness);
     return betweeness;
 }
 function calculateClosenessCentrality(){
     var closeness = 0;
 
-    dataToSave.push(closeness + "\n");
+    nodeDataToSave.push(closeness + "\n");
     return closeness;
 }
