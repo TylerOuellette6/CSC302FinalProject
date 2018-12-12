@@ -8,7 +8,7 @@
 
 	<!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    
+
 	<!-- Styles -->
     <link rel="stylesheet" href="normalize.css"/>
     <link rel="stylesheet" href="style.css"/>
@@ -20,7 +20,10 @@
 
     <!-- Boostrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>   
+
+    <!-- jsZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.js"></script>
 </head>
 
 <div id="file-uploads">
@@ -50,8 +53,6 @@
 	</form>
 
 	<input type="submit" id="create-tables" value="Create Tables">
-
-
 </div>
 
 <div id="data_page" hidden>
@@ -59,8 +60,8 @@
 		<div class="container-fluid">
 			<ul class="nav navbar-nav">
 				<li id="return-to-uploads"><a href="#">Return to Uploads</a></li>
-				<li><a href="#">Save Data (.tsv)</a></li>
-				<li><a href="#">Save Data (.csv)</a></li>
+				<li><a href="#" id="save-as-tsv">Save Data (.tsv)</a></li>
+				<li><a href="#" id="save-as-csv">Save Data (.csv)</a></li>
 			</ul>
 		</div>
 	</nav>
@@ -78,6 +79,9 @@
     </div>
 </div>
 
+<div id="cy"></div>
+
+<script src="FileSaver.js"></script>
 <!-- Javascrip that controls everything on the page -->
 <!-- This includes event handlers for both "views" and jsGrid stuff -->
 <script src="index.js"></script>

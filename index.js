@@ -39,6 +39,9 @@ $(document).ready(function(){
     $(document).on('click', "#nodes-view", showNodesTable)
     $(document).on('click', "#edges-view", showEdgesTable)
 
+    $(document).on('click', "#save-as-tsv", saveAsTSV)
+    $(document).on('click', "#save-as-csv", saveAsCSV)
+
 });
 
 var handleHeaderYes = function(event){
@@ -472,6 +475,17 @@ function showEdgesTable(event){
     $("#nodes-view").prop("disabled", false);
 }
 
+function saveAsTSV(){
+    var zip = new JSZip();
+    zip.file("hello.tsv", "Hello World\n");
+
+    zip.generateAsync({type:"blob"}).then(function(blob) {
+        saveAs(blob, "hello.zip");
+    });
+}
+function saveAsCSV(){
+
+}
 
 // Calculations
 // Entire Network Metrics
@@ -501,7 +515,7 @@ function calculateDensity(sources, nodes){
     var pc = (numNodes * (numNodes-1))/2;
     var density = numEdges / pc;
 
-    return density;
+    return density.toFixed(6);
 }
 function calculateNumConnectedComponents(){
 
@@ -551,7 +565,7 @@ function calculateInDegree(node, targets, graphType){
             }
         }
     }
-    return inDegree.toFixed(6);
+    return inDegree;
 }
 function calculateOutDegree(node, sources, graphType){
     var outDegree = 0;
