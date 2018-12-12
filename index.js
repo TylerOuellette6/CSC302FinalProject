@@ -43,10 +43,37 @@ $(document).ready(function(){
     $(document).on('click', "#nodes-view", showNodesTable)
     $(document).on('click', "#edges-view", showEdgesTable)
 
+    // Handles user saving the data
     $(document).on('click', "#save-as-tsv", saveAsTSV)
     $(document).on('click', "#save-as-csv", saveAsCSV)
 
 });
+
+/**
+    * Helper function to reduce code for making radio buttons
+    * Makes a radio button using the passed in parameters and adds it to the page
+    *
+    * @param vertex - Either source or target
+    * @param firstRow - The text of the first row
+    * @param divElement - Which part of the page the new radio button will go on
+    * @param number - The number of the column 
+    */
+radioButtonMaker = function($vertex, $headerText, $divElement){
+    // Makes the button
+    var radioButton = document.createElement("input");
+    radioButton.setAttribute("type", "radio");
+    radioButton.setAttribute("id", $vertex + "-" + $headerText);
+    radioButton.setAttribute("class", "radio");
+
+    // Makes a label for the button
+    var radioButtonText = document.createElement("label");
+    radioButtonText.setAttribute("id", $vertex + "-" + $headerText + "label")
+    radioButtonText.innerHTML = $headerText;
+
+    // Adds the button and label to the HTML page
+    $divElement.appendChild(radioButton);
+    $divElement.appendChild(radioButtonText);
+}
 
 var handleHeaderYes = function(event){
     // Get the file
@@ -84,31 +111,6 @@ var handleHeaderYes = function(event){
     targeth5.innerHTML = "Target: ";
     targeth5.setAttribute("id", "targeth5");
     targetSelection.appendChild(targeth5);
-
-    /**
-    * Helper function to reduce code for making radio buttons
-    * Makes a radio button using the passed in parameters and adds it to the page
-    *
-    * @param vertex - Either source or target
-    * @param headerText - The text of the header (based on the document)
-    * @param divElement - Which part of the page the new radio button will go on
-    */
-    radioButtonMaker = function($vertex, $headerText, $divElement){
-        // Makes the button
-        var radioButton = document.createElement("input");
-        radioButton.setAttribute("type", "radio");
-        radioButton.setAttribute("id", $vertex + "-" + $headerText);
-        radioButton.setAttribute("class", "radio");
-
-        // Makes a label for the button
-        var radioButtonText = document.createElement("label");
-        radioButtonText.setAttribute("id", $vertex + "-" + $headerText + "label")
-        radioButtonText.innerHTML = $headerText;
-
-        // Adds the button and label to the HTML page
-        $divElement.appendChild(radioButton);
-        $divElement.appendChild(radioButtonText);
-    }
 
     // For loop to make enough radio buttons to correspond to each header
     for(var i=0; i<justHeaders.length; i++){
@@ -159,29 +161,6 @@ var handleHeaderNo = function(event){
     targeth5.innerHTML = "Target: ";
     targeth5.setAttribute("id", "targeth5");
     targetSelection.appendChild(targeth5);
-
-    /**
-    * Helper function to reduce code for making radio buttons
-    * Makes a radio button using the passed in parameters and adds it to the page
-    *
-    * @param vertex - Either source or target
-    * @param firstRow - The text of the first row
-    * @param divElement - Which part of the page the new radio button will go on
-    * @param number - The number of the column 
-    */
-    radioButtonMaker = function($vertex, $firstRow, $divElement, $number){
-        var radioButton = document.createElement("input");
-        radioButton.setAttribute("type", "radio");
-        radioButton.setAttribute("id", $vertex + "-" + $firstRow);
-        radioButton.setAttribute("class", "radio");
-
-        var radioButtonText = document.createElement("label");
-        radioButtonText.setAttribute("id", $vertex + "-" + $firstRow + "label")
-        radioButtonText.innerHTML = "Column " + $number;
-
-        $divElement.appendChild(radioButton);
-        $divElement.appendChild(radioButtonText);
-    }
 
     // For loop to make enough radio buttons to correspond to each header
     for(var i=0; i<firstRow.length; i++){
@@ -436,7 +415,6 @@ var createTables = function(event){
     });
 
     event.preventDefault();
-    // window.history.pushState("", "Title", "/~touellette/data_tables");
 };
 
 // Allows the user to go back to the uploads page
