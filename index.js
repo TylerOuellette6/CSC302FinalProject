@@ -398,7 +398,7 @@ var createTables = function(event){
         {
             "Total Nodes" : calculateTotalNodes(justNodeData),
             "Total Edges" : calculateTotalEdges(justSourceData), 
-            "Unique Edges" : calculateUniqueEdges(),
+            "Unique Edges" : calculateUniqueEdges(justSourceData, justTargetData),
             "Max Geodesic Distance (Diameter)" : calculateMaxGeodesicDistance(),
             "Avg Geodesic Distance" : calculateAvgGeodesicDistance(),
             "Density" : calculateDensity(justSourceData, justNodeData),
@@ -526,11 +526,23 @@ function calculateTotalEdges(sources){
     // Only needs source since there's never going to be more sources than targets and vice versa
     return sources.length;
 }
-function calculateUniqueEdges(sources, targets, graphType){
-    var uniqueEdges = 0;
+function calculateUniqueEdges(sources, targets){
+    var numUniqueEdges = 0;
+    var allEdges = [];
+    // Make the edge and target one string
+    for(var i=0; i<sources.length; i++){
+        var sourceAndTargetCombo;
+        sourceAndEdgeCombo = sources[i] + targets[i];
+        allEdges.push(sourceAndTargetCombo)
+    }
 
-    networkDataToSave.push(uniqueEdges);
-    return uniqueEdges;
+    // How to remove dupes: https://wsvincent.com/javascript-remove-duplicates-array/
+    // Remove all the duplicates from the allEdges array and put in a unique array
+    let uniqueEdges = [...new Set(allEdges)];
+    numUniqueEdges = uniqueEdges.length;
+
+    networkDataToSave.push(numUniqueEdges);
+    return numUniqueEdges;
 }
 function calculateMaxGeodesicDistance(){
     var diameter = 0;
