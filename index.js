@@ -16,6 +16,9 @@ var mergeTypeSetting = localStorage.getItem('mergeTypeSetting');
 var sourceHeader = null;
 var targetHeader = null;
 
+// Array of all the data that will be written out to a file
+var dataToSave = [];
+
 $(document).ready(function(){
     localStorage.clear();
 
@@ -350,13 +353,19 @@ var createTables = function(event){
     // Populates the nodes table
     nodesGridData = [];
     var justNodeData = localStorage.getItem('nodeData').split(",");
+    // Populate the data to save with the Node Headers
+    dataToSave.push("Node", "In-Degree", "Out-Degree", "Degree", "Betweeness Centrality", "Closeness Centrality\n");
+    console.log(dataToSave);
     // Goes through all the nodes and does calculations on all of them
     for(var i=0; i<justNodeData.length; i++){
         var dataForNodes = {};
         dataForNodes["Node"] = justNodeData[i];
-        dataForNodes["In-Degree"] = calculateInDegree(justNodeData[i], justTargetData, localStorage.getItem('graphTypeSetting'));
-        dataForNodes["Out-Degree"] = calculateOutDegree(justNodeData[i], justSourceData, localStorage.getItem('graphTypeSetting'));
-        dataForNodes["Degree (In + Out)"] = calculateDegree(justNodeData[i], justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'));
+        dataToSave.push(justNodeData[i]);
+        dataForNodes["In-Degree"] = calculateInDegree(justNodeData[i], justTargetData, localStorage.getItem('graphTypeSetting'), true);
+        dataForNodes["Out-Degree"] = calculateOutDegree(justNodeData[i], justSourceData, localStorage.getItem('graphTypeSetting'), true);
+        dataForNodes["Degree (In + Out)"] = calculateDegree(justNodeData[i], justSourceData, justTargetData, localStorage.getItem('graphTypeSetting'), true);
+        dataForNodes["Betweeness Centrality"] = calculateBetweenessCentrality();
+        dataForNodes["Closeness Centrality"] = calculateClosenessCentrality();
         nodesGridData.push(dataForNodes);
     }
     // Makes the table with the data from above 
@@ -477,7 +486,7 @@ function showEdgesTable(event){
 
 function saveAsTSV(){
     var zip = new JSZip();
-    zip.file("hello.tsv", "Hello World\n");
+    zip.file("hello.tsv", dataToSave.toString());
 
     zip.generateAsync({type:"blob"}).then(function(blob) {
         saveAs(blob, "hello.zip");
@@ -528,7 +537,7 @@ function calculateAvgInDegree(nodes, targets, graphType){
     var numNodes = nodes.length;
     if(graphType === "directed"){
         for(var i=0; i<nodes.length; i++){
-            totalInDegree += calculateInDegree(nodes[i], targets, graphType);
+            totalInDegree += calculateInDegree(nodes[i], targets, graphType, false);
         }
     }
 
@@ -539,7 +548,7 @@ function calculateAvgOutDegree(nodes, sources, graphType){
     var numNodes = nodes.length;
     if(graphType === "directed"){
         for(var i=0; i<nodes.length; i++){
-            totalOutDegree += calculateOutDegree(nodes[i], sources, graphType);
+            totalOutDegree += calculateOutDegree(nodes[i], sources, graphType, false);
         }
     }
 
@@ -549,14 +558,14 @@ function calculateAvgDegree(nodes, sources, targets, graphType){
     var totalDegree = 0;
     var numNodes = nodes.length;
     for(var i=0; i<nodes.length; i++){
-        totalDegree += calculateDegree(nodes[i], sources, targets, graphType);
+        totalDegree += calculateDegree(nodes[i], sources, targets, graphType, false);
     }
 
     return (totalDegree/numNodes).toFixed(4);
 }
 
 // Per Node Metrics
-function calculateInDegree(node, targets, graphType){
+function calculateInDegree(node, targets, graphType, firstTime){
     var inDegree = 0;
     if(graphType === "directed"){
         for(var i=0; i<targets.length; i++){
@@ -565,9 +574,10 @@ function calculateInDegree(node, targets, graphType){
             }
         }
     }
+    if(firstTime){dataToSave.push(inDegree);}
     return inDegree;
 }
-function calculateOutDegree(node, sources, graphType){
+function calculateOutDegree(node, sources, graphType, firstTime){
     var outDegree = 0;
     if(graphType === "directed"){
         for(var i=0; i<sources.length; i++){
@@ -576,9 +586,10 @@ function calculateOutDegree(node, sources, graphType){
             }
         }
     }
+    if(firstTime){dataToSave.push(outDegree);}
     return outDegree;
 }
-function calculateDegree(node, sources, targets, graphType){
+function calculateDegree(node, sources, targets, graphType, firstTime){
     var degree = 0;
     if(graphType === "directed"){
         degree += calculateInDegree(node, targets, graphType);
@@ -594,12 +605,18 @@ function calculateDegree(node, sources, targets, graphType){
             }
         }
     }
-
+    if(firstTime){dataToSave.push(degree);}
     return degree;
 }
 function calculateBetweenessCentrality(){
+    var betweeness = 0;
 
+    dataToSave.push(betweeness);
+    return betweeness;
 }
 function calculateClosenessCentrality(){
+    var closeness = 0;
 
+    dataToSave.push(closeness + "\n");
+    return closeness;
 }
