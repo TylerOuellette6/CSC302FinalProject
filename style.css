@@ -16,6 +16,12 @@ header, body, footer, aside, nav, main, article, figure {
 
 	transform: translate(-50%, -50%);
 }
+#file-uploads h2{
+	display: inline-block;
+	margin: 10px;
+	font-style: bold, underline;
+	font-size: 70px;
+}
 #file-uploads h1{
 	display: inline-block;
 	margin: 10px;
